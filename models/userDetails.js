@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../database/db");
-const { UserAcccount } = require("./index");
+const { UserAcccount } = require("./index")
 
 const UserDetails = sequelize.define(
   "UserDetails",
@@ -13,7 +13,6 @@ const UserDetails = sequelize.define(
 
     UserId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       references: {
         model: UserAcccount,
         key: "UserId",
@@ -40,8 +39,9 @@ const UserDetails = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+
   },
   { freezeTableName: true, timestamps: false }
 );
 
-module.exports = { UserDetails };
+module.exports = UserDetails;

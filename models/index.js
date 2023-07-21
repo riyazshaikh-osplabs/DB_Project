@@ -1,11 +1,11 @@
-const { UserAccount } = require("./userAccount");
-const { UserDetails } = require("./userDetails");
-const { UserRole } = require("./userRole");
+const UserAccount = require("./userAccount")
+const UserDetails = require("./userDetails");
+const UserRole = require("./userRole");
 
-// UserAccount.hasOne(UserRole, {
-//   foreignKey: "RoleId",
-//   targetKey: "RoleId",
-// });
+UserAccount.belongsTo(UserRole, {
+  foreignKey: "RoleId",
+  targetKey: "RoleId",
+});
 
 UserDetails.belongsTo(UserAccount, {
   foreignKey: "UserId",

@@ -4,7 +4,7 @@
   "description": "db",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon start"
+    "start": "nodemon  index.js"
   },
   "author": "riyaz",
   "license": "ISC",

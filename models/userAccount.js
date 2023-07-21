@@ -48,4 +48,4 @@ const UserAccount = sequelize.define(
   { freezeTableName: true, timestamps: false }
 );
 
-module.exports = { UserAccount };
+module.exports = UserAccount;
