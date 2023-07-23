@@ -98,16 +98,15 @@ const FetchUserByIdAndDelete = async (UserId) => {
 }
 
 const UpdateUserStatus = async (UserId, status) => {
-  console.log(UserId, typeof status)
+
   const user = await UserAccount.findOne({ where: { UserId } });
   if (!user) {
     throw new Error("User Not Found");
   }
 
   await user.update({ IsDisabled: status })
-  console.log(user);
+  // console.log(user);
   return user;
-
 };
 
 const FindUserByParam = async (UserId) => {
