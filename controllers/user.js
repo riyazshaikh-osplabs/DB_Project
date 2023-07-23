@@ -1,7 +1,8 @@
 const { SendResponse } = require("../utils/utils");
 const { FindRoleByName, SignUpUserDetails, SignUpUserAccount, FindUser, FindUserByEmail, FetchUserDetails,
-  UpdateUserStatus, FetchUserByIdAndDelete } = require("../models/dbHelper/helper");
+  UpdateUserStatus, FetchUserByIdAndDelete, FindUserByParam, DeleteUserDetails } = require("../models/dbHelper/helper");
 const bcrypt = require("bcryptjs");
+const { UserDetails } = require("../models");
 
 const SignUp = async (req, res, next) => {
   const { Email, Password, FirstName, LastName, RoleName } = req.body;
@@ -68,7 +69,7 @@ const GetUserDetails = async (req, res, next) => {
   const id = parseInt(req.params.id);
   try {
     const usersDetails = await FetchUserDetails(id);
-    return SendResponse(res, 200, "User Details", usersDetails, true)
+    return SendResponse(res, 200, "User Details", usersDetails, true);
   } catch (error) {
     next(error);
   }
@@ -83,7 +84,7 @@ const DeleteUser = async (req, res, next) => {
 
     SendResponse(res, 200, "User Deleted Successfully", null, true);
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
@@ -94,10 +95,38 @@ const UserActivation = async (req, res, next) => {
 
     const user = await UpdateUserStatus(id, status);
 
-    SendResponse(res, 200, `User ${status == true ? ' activated' : ' deactivated'}`, user, true)
+    SendResponse(res, 200, `User ${status == true ? ' activated' : ' deactivated'}`, user, true);
   } catch (error) {
-    next(error)
+    next(error);
   }
 }
 
-module.exports = { SignUp, SignIn, DeleteUser, UserActivation, GetUserDetails };
+const UpdateUser = async (req, res, next) => {
+  const UserId = parseInt(req.params.id);
+  const { FirstName, LastName, Email } = req.body;
+  try {
+    const user = await FindUserByParam(UserId);
+    if (!user) {
+      return SendResponse(res, 404, "User not found", null, false);
+    }
+    await user.update({ FirstName: FirstName, LastName: LastName, Email: Email });
+
+    SendResponse(res, 200, "User Updated Successfully", user, true);
+  } catch (error) {
+    next(error);
+  }
+}
+
+const PermanentDeleteUser = async (req, res, next) => {
+  const UserId = parseInt(req.params.id);
+  try {
+
+    await DeleteUserDetails(UserId);
+
+    SendResponse(res, 200, "User Deleted Successfully!", null, true);
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { SignUp, SignIn, DeleteUser, UserActivation, GetUserDetails, PermanentDeleteUser, UpdateUser };

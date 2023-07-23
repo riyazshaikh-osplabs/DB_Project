@@ -110,6 +110,41 @@ const UpdateUserStatus = async (UserId, status) => {
 
 };
 
+const FindUserByParam = async (UserId) => {
+  const user = await UserDetails.findOne({ where: { UserId } });
+  return user;
+}
+
+const DeleteUserDetails = async (UserId) => {
+
+  await UserDetails.destroy({
+    where: {
+      UserId: UserId
+    }
+  });
+
+  // const userAccount = await UserAccount.findOne({
+  //   where: { UserId },
+  //   include: [{
+  //     model: UserRole,
+  //     attributes: ['Role'],
+  //   }]
+  // });
+  // const Role = userAccount?.UserRole?.Role ?? "not found";
+
+  // await UserRole.destroy({
+  //   where: {
+  //     Role: Role
+  //   }
+  // })
+
+  await UserAccount.destroy({
+    where: { UserId }
+  });
+
+  return;
+}
+
 module.exports = {
   GenerateHashPassword,
   SignUpUserAccount,
@@ -120,5 +155,7 @@ module.exports = {
   FetchUserDetails,
   FetchUserByIdAndDelete,
   UpdateUserStatus,
+  FindUserByParam,
+  DeleteUserDetails,
   FindUser
 };
