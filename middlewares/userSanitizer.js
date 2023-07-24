@@ -90,4 +90,5 @@ const CheckUserActivation = async (req, res, next) => {
     }
 };
 
+
 module.exports = { RoleExistsMiddleware, UserExistsByEmailSignin, UserExistsByEmailSignup, CheckUserActivation };

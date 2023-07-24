@@ -8,11 +8,13 @@ const UserRole = sequelize.define(
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
+      allowNull: false
     },
 
     Role: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true
     },
   },
   { freezeTableName: true, timestamps: false }
