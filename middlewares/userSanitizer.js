@@ -1,3 +1,4 @@
+const { UserDetails, UserAccount } = require("../models");
 const { FindRoleByName, FindUserByEmail, FindUser } = require("../models/dbHelper/helper");
 const { SendResponse } = require("../utils/utils");
 
@@ -91,4 +92,49 @@ const CheckUserActivation = async (req, res, next) => {
 };
 
 
+<<<<<<< HEAD
 module.exports = { RoleExistsMiddleware, UserExistsByEmailSignin, UserExistsByEmailSignup, CheckUserActivation };
+=======
+const CheckUserForUserDetails = async (req, res, next) => {
+
+    const UserId = parseInt(req.params.id);
+
+    try {
+        const user = await UserDetails.findOne({ where: { UserId } });
+
+        if (!user) {
+            return SendResponse(res, 404, "User Not Found!", null, false);
+        }
+
+        req.foundUser = user;
+
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
+
+const CheckUserForUserAccount = async (req, res, next) => {
+    const UserId = parseInt(req.params.id);
+
+    try {
+        const user = await UserAccount.findOne({ where: { UserId } });
+
+        if (!user) {
+            return SendResponse(res, 404, "User Not Found!", null, false);
+        }
+
+        req.foundUser = user;
+
+        next();
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = {
+    RoleExistsMiddleware, UserExistsByEmailSignin,
+    UserExistsByEmailSignup, CheckUserForUserDetails,
+    CheckUserForUserAccount, CheckUserActivation
+};
+>>>>>>> dev

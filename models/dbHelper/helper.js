@@ -1,6 +1,5 @@
 const bcrypt = require("bcryptjs");
 const { UserDetails, UserRole, UserAccount } = require("../index");
-const { SendResponse } = require("../../utils/utils");
 
 const FindRoleByName = async (roleName) => {
   return UserRole.findOne({ where: { Role: roleName }, });
@@ -76,28 +75,6 @@ const FetchUserDetails = async (UserId) => {
   };
 };
 
-const FetchUserByIdAndDelete = async (UserId) => {
-  const user = await UserAccount.findOne({ where: { UserId } });
-  if (!user) {
-    throw new Error("User Not Found");
-  }
-  // console.log("before", user);
-  await user.update({ IsDeleted: true });
-  // console.log("after", user);
-  return;
-};
-
-const UpdateUserStatus = async (UserId, status) => {
-
-  const user = await UserAccount.findOne({ where: { UserId } });
-  if (!user) {
-    throw new Error("User Not Found");
-  }
-
-  await user.update({ IsDisabled: status })
-  // console.log(user);
-  return user;
-};
 
 const FindUserByParam = async (UserId) => {
   const user = await UserDetails.findOne({ where: { UserId } });
@@ -105,12 +82,6 @@ const FindUserByParam = async (UserId) => {
 };
 
 const DeleteUserDetails = async (UserId) => {
-
-  const user = await UserDetails.findOne({ where: { UserId } });
-
-  if (!user) {
-    throw new Error("User Not Found!")
-  }
 
   await UserDetails.destroy({
     where: {
@@ -126,16 +97,6 @@ const DeleteUserDetails = async (UserId) => {
 };
 
 module.exports = {
-  GenerateHashPassword,
-  SignUpUserAccount,
-  SignUpUserDetails,
-  FindRoleByName,
-  FindUserById,
-  FindUserByEmail,
-  FetchUserDetails,
-  FetchUserByIdAndDelete,
-  UpdateUserStatus,
-  FindUserByParam,
-  DeleteUserDetails,
-  FindUser
+  GenerateHashPassword, SignUpUserAccount, SignUpUserDetails, FindRoleByName, FindUserById, FindUserByEmail,
+  FetchUserDetails, FindUserByParam, DeleteUserDetails, FindUser
 };
