@@ -1,6 +1,5 @@
 const { SendResponse } = require("../utils/utils");
-const { SignUpUserDetails, SignUpUserAccount, FindUser, FindUserByEmail, FetchUserDetails,
-  UpdateUserStatus, FetchUserByIdAndDelete, FindUserByParam, DeleteUserDetails } = require("../models/dbHelper/helper");
+const { SignUpUserDetails, SignUpUserAccount, FetchUserDetails, DeleteUserDetails } = require("../models/dbHelper/helper");
 const bcrypt = require("bcryptjs");
 
 const SignUp = async (req, res, next) => {
@@ -82,26 +81,33 @@ const GetUserDetails = async (req, res, next) => {
 };
 
 const DeleteUser = async (req, res, next) => {
-  const id = req.params.id;
 
   try {
 
-    await FetchUserByIdAndDelete(id);
+    // await FetchUserByIdAndDelete(id);
+    const user = req.foundUser;
 
-    return SendResponse(res, 200, "User Deleted Successfully", null, true);
+    await user.update({ IsDeleted: true });
+
+
+    SendResponse(res, 200, "User Deleted Successfully", null, true);
   } catch (error) {
     next(error);
   }
 };
 
 const UserActivation = async (req, res, next) => {
-  const id = parseInt(req.params.id);
-  const { status } = req.body;
+  const status = req.body.status;
+
   try {
 
-    const user = await UpdateUserStatus(id, status);
+    const user = req.foundUser;
 
-    return SendResponse(res, 200, `User ${status == true ? ' activated' : ' deactivated'}`, user, true);
+    console.log(user);
+
+    user.update({ IsDisabled: status });
+
+    return SendResponse(res, 200, `User ${user.IsDisabled == true ? ' deactivated' : ' activated'}`, user, true);
   } catch (error) {
     next(error);
   }
@@ -110,16 +116,12 @@ const UserActivation = async (req, res, next) => {
 
 const UpdateUser = async (req, res, next) => {
 
-  const UserId = parseInt(req.params.id);
+  // const UserId = parseInt(req.params.id);
   const { FirstName, LastName, Email } = req.body;
 
   try {
 
-    const user = await FindUserByParam(UserId);
-
-    if (!user) {
-      return SendResponse(res, 404, "User not found", null, false);
-    }
+    const user = req.foundUser;
 
     await user.update({ FirstName: FirstName, LastName: LastName, Email: Email });
 

@@ -17,5 +17,8 @@
     "nodemon": "^3.0.1",
     "pg": "^8.11.1",
     "sequelize": "^6.32.1"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.1"
   }
 }
