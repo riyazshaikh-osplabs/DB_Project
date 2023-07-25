@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const { UserDetails, UserAccount } = require("../models");
 const { FindRoleByName, FindUserByEmail, FindUser } = require("../models/dbHelper/helper");
 const { SendResponse } = require("../utils/utils");
@@ -92,9 +93,7 @@ const CheckUserActivation = async (req, res, next) => {
 };
 
 
-<<<<<<< HEAD
 module.exports = { RoleExistsMiddleware, UserExistsByEmailSignin, UserExistsByEmailSignup, CheckUserActivation };
-=======
 const CheckUserForUserDetails = async (req, res, next) => {
 
     const UserId = parseInt(req.params.id);
@@ -130,11 +129,41 @@ const CheckUserForUserAccount = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-}
+};
+
+const IsLoggedIn = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    console.log(authHeader, typeof authHeader);
+    if (!authHeader) {
+        return SendResponse(res, 401, "Token is required", null, false);
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+        return SendResponse(res, 401, "Invalid Token Format", null, false);
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    const verifiedUser = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    console.log("verify user hai", verifiedUser.UserDetails);
+
+    if (!verifiedUser.FirstName || !verifiedUser.LastName || !verifiedUser.Email) {
+        return SendResponse(res, 401, "Invalid Token Data || Unauthorized", null, false);
+    }
+
+    const user = {
+        FirstName: verifiedUser.FirstName,
+        LastName: verifiedUser.LastName,
+        Email: verifiedUser.Email
+    }
+
+    req.User = user;
+    next();
+};
 
 module.exports = {
     RoleExistsMiddleware, UserExistsByEmailSignin,
     UserExistsByEmailSignup, CheckUserForUserDetails,
-    CheckUserForUserAccount, CheckUserActivation
+    CheckUserForUserAccount, CheckUserActivation, IsLoggedIn
 };
->>>>>>> dev

@@ -77,6 +77,11 @@ const ValidateUpdateFields = [
         .isStrongPassword().withMessage("'the password must contain 6 characters, 1 lower case letter, 1 upper case letter, 1 number and 1 symbol'"),
 ];
 
+const validateActivationStatus = [
+    body('status')
+        .notEmpty().withMessage('status should not be empty').bail()
+        .isBoolean().withMessage('status should only contain boolean values')
+]
 const ErrorHandling = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -85,4 +90,6 @@ const ErrorHandling = (req, res, next) => {
     next();
 };
 
-module.exports = { ValidateSignupFields, ValidateSigninFields, ValidateUpdateFields, validateIdParam, ErrorHandling }
+
+
+module.exports = { ValidateSignupFields, ValidateSigninFields, ValidateUpdateFields, validateIdParam, validateActivationStatus, ErrorHandling }

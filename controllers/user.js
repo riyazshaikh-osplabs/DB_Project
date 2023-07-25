@@ -1,27 +1,16 @@
 const { SendResponse } = require("../utils/utils");
 const { SignUpUserDetails, SignUpUserAccount, FetchUserDetails, DeleteUserDetails } = require("../models/dbHelper/helper");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const SignUp = async (req, res, next) => {
   const { Email, Password, FirstName, LastName } = req.body;
 
   try {
 
-    // const existingUser = await FindUserByEmail(Email);
-    // if (existingUser) {
-    //   return SendResponse(res, 400, "User Already Exists!", null, false);
-    // }
-
-    // const existingRole = await FindRoleByName(RoleName);
-    // if (!existingRole) {
-    //   return SendResponse(res, 400, "User Role DoesNot Exists!", null, false);
-    // }
-
     const newUserAccount = await SignUpUserAccount(req.RoleId);
-    // console.log("newUserAccount", newUserAccount);
 
     const newUserDetails = await SignUpUserDetails(newUserAccount.UserId, Email, Password, FirstName, LastName);
-    // console.log("newUserDetails", newUserDetails);
 
     return SendResponse(res, 200, "User Registered Successfully", newUserDetails, true);
   } catch (error) {
@@ -30,26 +19,11 @@ const SignUp = async (req, res, next) => {
 };
 
 const SignIn = async (req, res, next) => {
-  const { Password } = req.body;
+  const Password = req.body.Password;
 
   try {
-    // const existingUser = await FindUserByEmail(Email);
 
-    // if (!existingUser) {
-    //   return SendResponse(res, 404, "User Not Found!", null, false);
-    // }
     const existingUser = req.existingUser;
-    // const user = await FindUser(existingUser);
-
-    // if (!user) {
-    //   return SendResponse(res, 404, "User Not Found!", null, false);
-    // }
-
-    // if user is deleted or disabled then prevent login....
-    // if (user.IsDeleted || user.IsDisabled) {
-    //   const message = user.IsDeleted ? "User Account is Deleted!" : "User Account is Disabled";
-    //   return SendResponse(res, 403, message, null, false);
-    // }
 
     // comparing the password..
     const isValidPassword = await bcrypt.compare(Password, existingUser.Password);
@@ -58,8 +32,21 @@ const SignIn = async (req, res, next) => {
       return SendResponse(res, 400, "Invalid Password", null, false);
     }
 
-    // if password is valid...
-    return SendResponse(res, 200, "Signin Successful", existingUser, true);
+    // if password is valid. creating a token with payload..
+    const payload = {
+      FirstName: existingUser.FirstName,
+      LastName: existingUser.LastName,
+      Email: existingUser.Email
+    };
+
+    // setting token expiration for only 2 minutes...
+    // const expireTime = 120;
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: "24h" });
+
+
+
+    return SendResponse(res, 200, "Signin Successful", token, true);
 
   } catch (error) {
     next(error);
@@ -67,7 +54,6 @@ const SignIn = async (req, res, next) => {
 };
 
 const GetUserDetails = async (req, res, next) => {
-
   const id = parseInt(req.params.id);
 
   try {
@@ -81,14 +67,12 @@ const GetUserDetails = async (req, res, next) => {
 };
 
 const DeleteUser = async (req, res, next) => {
-
   try {
 
     // await FetchUserByIdAndDelete(id);
     const user = req.foundUser;
 
     await user.update({ IsDeleted: true });
-
 
     SendResponse(res, 200, "User Deleted Successfully", null, true);
   } catch (error) {
@@ -103,8 +87,6 @@ const UserActivation = async (req, res, next) => {
 
     const user = req.foundUser;
 
-    console.log(user);
-
     user.update({ IsDisabled: status });
 
     return SendResponse(res, 200, `User ${user.IsDisabled == true ? ' deactivated' : ' activated'}`, user, true);
@@ -115,7 +97,6 @@ const UserActivation = async (req, res, next) => {
 
 
 const UpdateUser = async (req, res, next) => {
-
   // const UserId = parseInt(req.params.id);
   const { FirstName, LastName, Email } = req.body;
 

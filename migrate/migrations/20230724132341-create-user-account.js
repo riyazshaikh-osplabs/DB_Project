@@ -48,7 +48,19 @@ module.exports = {
       },
 
     }, { freezeTableName: true, timestamps: false });
+
+    await queryInterface.addConstraint('UserAccount', {
+
+      fields: ['RoleId'],
+      type: 'foreign key',
+
+      references: {
+        table: 'UserRole',
+        field: 'RoleId'
+      }
+    });
   },
+
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('UserAccount');
   }
