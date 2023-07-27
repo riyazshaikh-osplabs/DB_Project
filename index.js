@@ -1,5 +1,7 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
+const path = require('path');
 const { PageNotFound, SendError } = require("./utils/utils");
 
 // setting up the routes...
@@ -14,6 +16,7 @@ app.listen(PORT, async () => {
 
 // parsing the data
 app.use(express.json());
+app.use(cors());
 
 app.use("/api/route", RouteHandler);
 
@@ -22,3 +25,7 @@ app.use(SendError);
 
 // settingi up the 404 route...
 app.use(PageNotFound);
+
+// setting up the view engine...
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));

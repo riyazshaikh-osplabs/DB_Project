@@ -2,7 +2,7 @@ const { SendResponse } = require("../utils/utils");
 const { FetchAdminDetails, FetchNormalUsersDetails, GenerateHashPassword, UpdateUser } = require("../models/dbHelper/helper");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { UserDetails } = require("../models");
+const { UserDetails, UserAccount } = require("../models");
 
 const AdminSignIn = async (req, res, next) => {
 
@@ -108,5 +108,41 @@ const UpdateNormalUser = async (req, res, next) => {
     }
 };
 
+const ViewEngine = async (req, res, next) => {
+    try {
+        res.render('index', { FirstName: "Riyaz", LastName: "Shaikh" });
+    } catch (error) {
+        next(error);
+    }
+}
 
-module.exports = { AdminSignIn, GetAdminDetails, GetUsersList, UpdateAdminUserPassword, UpdateNormalUser };
+const GetAdminDetails1 = async (req, res, next) => {
+    try {
+        const adminDetails = await UserDetails.findOne({
+            attributes: ['Email', 'FirstName', 'LastName'],
+            include: [{
+                model: UserAccount,
+                where: { IsAdmin: true },
+                attributes: ["IsAdmin", "RoleId"],
+                required: true
+            }],
+        });
+
+        if (!adminDetails) {
+            return SendResponse(res, 400, "Admin User Not Found", null, false);
+        }
+
+        const user = {
+            Email: adminDetails.Email,
+            FirstName: adminDetails.FirstName,
+            LastName: adminDetails.LastName,
+            IsAdmin: adminDetails.UserAccount.IsAdmin,
+            RoleId: adminDetails.UserAccount.RoleId
+        };
+        SendResponse(res, 200, "User List", user, true);
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { AdminSignIn, GetAdminDetails, GetUsersList, UpdateAdminUserPassword, UpdateNormalUser, GetAdminDetails1, ViewEngine };

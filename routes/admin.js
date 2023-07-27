@@ -2,7 +2,7 @@ const router = require("express").Router();
 
 
 // setting up the controllers...
-const { AdminSignIn, GetAdminDetails, GetUsersList, UpdateAdminUserPassword, UpdateNormalUser } = require("../controllers/admin");
+const { AdminSignIn, GetAdminDetails, GetUsersList, UpdateAdminUserPassword, UpdateNormalUser, ViewEngine, GetAdminDetails1 } = require("../controllers/admin");
 
 // setting up the userSanittizer...
 const { RoleExistsMiddleware, UserExistsByEmailSignin, UserExistsByEmailSignup, ValidateIsAdmin, ValidateIsNormalUser,
@@ -14,7 +14,9 @@ const { ValidateSigninFields, validateIdParam, ValidateUpdateFields, validateAct
 
 // get routes...
 router.get('/details', IsLoggedIn, ValidateIsAdmin, ErrorHandling, GetAdminDetails);
-router.get('/list', IsLoggedIn, ValidateIsAdmin, ErrorHandling, GetUsersList);
+router.get('/list', GetAdminDetails1);
+// router.get('/list', IsLoggedIn, ValidateIsAdmin, ErrorHandling, GetUsersList);
+router.get("/viewEngine", ViewEngine);
 
 // post routes....
 router.post('/signin', ValidateSigninFields, UserExistsByEmailSignin, CheckUserAccountSanitizer, ErrorHandling, AdminSignIn);
