@@ -158,4 +158,12 @@ const ChangeUserPassword = async (req, res, next) => {
   }
 };
 
-module.exports = { SignUp, SignIn, DeleteUser, UserActivation, GetUserDetails, PermanentDeleteUser, UpdateUser, ChangeUserPassword };
+const User = async (req, res, next) => {
+  try {
+    SendResponse(res, 200, "User bolte", null, true);
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { SignUp, User, SignIn, DeleteUser, UserActivation, GetUserDetails, PermanentDeleteUser, UpdateUser, ChangeUserPassword };

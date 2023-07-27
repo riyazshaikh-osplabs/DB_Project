@@ -1,4 +1,4 @@
-const { body, validationResult, param } = require("express-validator");
+const { body, validationResult, param, check } = require("express-validator");
 
 const ValidateSignupFields = [
 
@@ -99,7 +99,5 @@ const ErrorHandling = (req, res, next) => {
     }
     next();
 };
-
-
 
 module.exports = { ValidateSignupFields, ValidateSigninFields, ValidateUpdateFields, validateIdParam, validateActivationStatus, ValidatePasswordFields, ErrorHandling }

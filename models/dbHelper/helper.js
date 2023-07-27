@@ -150,7 +150,20 @@ const FetchNormalUsersDetails = async () => {
 };
 
 
+const UpdateUser = async (user, foundUser) => {
+
+  const { FirstName, LastName, Email } = user;
+
+  const modifiedUser = await UserDetails.update({ FirstName: FirstName, LastName: LastName, Email: Email }, {
+    where: {
+      Email: foundUser.Email
+    }
+  });
+
+  return modifiedUser;
+}
+
 module.exports = {
   GenerateHashPassword, SignUpUserAccount, SignUpUserDetails, FindRoleByName, FindUserById, FindUserByEmail,
-  FetchUserDetails, FindUserByParam, DeleteUserDetails, FindUser, FetchAdminDetails, FetchNormalUsersDetails
+  FetchUserDetails, FindUserByParam, DeleteUserDetails, FindUser, FetchAdminDetails, FetchNormalUsersDetails, UpdateUser
 };

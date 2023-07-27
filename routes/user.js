@@ -1,7 +1,7 @@
 const router = require("express").Router();
 
 // setting up the middleware...
-const { ValidateSignupFields, ValidateSigninFields, validateIdParam, ValidateUpdateFields, validateActivationStatus, ValidatePasswordFields, ErrorHandling } = require("../middlewares/auth");
+const { ValidateSignupFields, ValidateSigninFields, validateIdParam, ValidateUpdateFields, validateActivationStatus, ValidatePasswordFields, HelloUser, ErrorHandling } = require("../middlewares/auth");
 
 // userSanitizer...
 const { RoleExistsMiddleware, UserExistsByEmailSignin, UserExistsByEmailSignup, ValidateIsAdmin, ValidateIsNormalUser,
@@ -9,7 +9,7 @@ const { RoleExistsMiddleware, UserExistsByEmailSignin, UserExistsByEmailSignup, 
     = require("../middlewares/userSanitizer");
 
 // setting up the controllers...
-const { SignUp, SignIn, DeleteUser, UserActivation, GetUserDetails, UpdateUser, PermanentDeleteUser, ChangeUserPassword } = require("../controllers/user");
+const { SignUp, SignIn, DeleteUser, UserActivation, GetUserDetails, UpdateUser, PermanentDeleteUser, ChangeUserPassword, User } = require("../controllers/user");
 
 // get routes...
 router.get("/userDetails/:id", validateIdParam, ErrorHandling, IsLoggedIn, ValidateIsNormalUser, GetUserDetails);
@@ -22,7 +22,7 @@ router.post("/activation/:id", validateIdParam, validateActivationStatus, CheckU
 
 // put routes...
 router.put("/editUser/:id", validateIdParam, CheckUserForUserDetails, ValidateUpdateFields, IsLoggedIn, ErrorHandling, UpdateUser);
-router.put("/changePassword", ValidatePasswordFields, IsLoggedIn, FetchUserWithPassword, ChangeUserPassword);
+router.put("/changePassword", IsLoggedIn, ValidatePasswordFields, IsLoggedIn, FetchUserWithPassword, ErrorHandling, ChangeUserPassword);
 
 // delete routes...
 router.delete("/deleteUser/:id", validateIdParam, CheckUserForUserAccount, ErrorHandling, IsLoggedIn, DeleteUser);

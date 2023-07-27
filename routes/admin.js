@@ -13,15 +13,15 @@ const { ValidateSigninFields, validateIdParam, ValidateUpdateFields, validateAct
 
 
 // get routes...
-router.get('/details', IsLoggedIn, ValidateIsAdmin, GetAdminDetails);
-router.get('/list', IsLoggedIn, ValidateIsAdmin, GetUsersList);
+router.get('/details', IsLoggedIn, ValidateIsAdmin, ErrorHandling, GetAdminDetails);
+router.get('/list', IsLoggedIn, ValidateIsAdmin, ErrorHandling, GetUsersList);
 
 // post routes....
 router.post('/signin', ValidateSigninFields, UserExistsByEmailSignin, CheckUserAccountSanitizer, ErrorHandling, AdminSignIn);
-router.put("/changePassword", IsLoggedIn, ValidatePasswordFields, ValidateIsAdmin, FetchUserWithPassword, UpdateAdminUserPassword);
+router.put("/changePassword", IsLoggedIn, ValidatePasswordFields, ValidateIsAdmin, FetchUserWithPassword, ErrorHandling, UpdateAdminUserPassword);
 
 // put routes....
-router.put("/editUser/:id", IsLoggedIn, validateIdParam, ErrorHandling, UpdateNormalUser);
+router.put("/editUser/:id", IsLoggedIn, ValidateIsAdmin, validateIdParam, CheckUserForUserAccount, CheckUserForUserDetails, ErrorHandling, UpdateNormalUser);
 
 // delete routes..
 // router.delete();

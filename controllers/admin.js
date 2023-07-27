@@ -1,5 +1,5 @@
 const { SendResponse } = require("../utils/utils");
-const { FetchAdminDetails, FetchNormalUsersDetails, GenerateHashPassword } = require("../models/dbHelper/helper");
+const { FetchAdminDetails, FetchNormalUsersDetails, GenerateHashPassword, UpdateUser } = require("../models/dbHelper/helper");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { UserDetails } = require("../models");
@@ -92,7 +92,21 @@ const UpdateAdminUserPassword = async (req, res, next) => {
     }
 };
 
-const UpdateNormalUser = async (req, res, next) => { };
+const UpdateNormalUser = async (req, res, next) => {
+    const { Email, FirstName, LastName } = req.body;
+
+    try {
+
+        const user = { Email, FirstName, LastName }
+        const foundUser = req.foundUser;
+        const updatedUser = await UpdateUser(user, foundUser);
+        console.log(updatedUser);
+
+        SendResponse(res, 200, "User Updated Successfully", updatedUser, true);
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 module.exports = { AdminSignIn, GetAdminDetails, GetUsersList, UpdateAdminUserPassword, UpdateNormalUser };
