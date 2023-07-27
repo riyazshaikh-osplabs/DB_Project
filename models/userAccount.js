@@ -36,6 +36,12 @@ const UserAccount = sequelize.define(
       allowNull: true,
     },
 
+    IsAdmin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: true
+    },
+
     RoleId: {
       type: DataTypes.INTEGER,
       allowNull: true,

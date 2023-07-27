@@ -51,7 +51,6 @@ const validateIdParam = [
     param('id')
         .notEmpty().withMessage('ID is required')
         .isInt({ min: 1 }).withMessage('ID must be a positive integer').bail()
-
 ];
 
 const ValidateUpdateFields = [
@@ -74,14 +73,25 @@ const ValidateUpdateFields = [
 
     body("Password")
         .optional()
-        .isStrongPassword().withMessage("'the password must contain 6 characters, 1 lower case letter, 1 upper case letter, 1 number and 1 symbol'"),
+        .isStrongPassword().withMessage("the password must contain 6 characters, 1 lower case letter, 1 upper case letter, 1 number and 1 symbol"),
 ];
 
 const validateActivationStatus = [
     body('status')
         .notEmpty().withMessage('status should not be empty').bail()
         .isBoolean().withMessage('status should only contain boolean values')
-]
+];
+
+const ValidatePasswordFields = [
+    body('Password')
+        .notEmpty().withMessage("Password field is required").bail()
+        .isStrongPassword().withMessage('the password must contain 6 characters, 1 lower case letter, 1 upper case letter, 1 number and 1 symbol'),
+
+    body("NewPassword")
+        .notEmpty().withMessage("Password field is required").bail()
+        .isStrongPassword().withMessage('the password must contain 6 characters, 1 lower case letter, 1 upper case letter, 1 number and 1 symbol'),
+];
+
 const ErrorHandling = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -92,4 +102,4 @@ const ErrorHandling = (req, res, next) => {
 
 
 
-module.exports = { ValidateSignupFields, ValidateSigninFields, ValidateUpdateFields, validateIdParam, validateActivationStatus, ErrorHandling }
+module.exports = { ValidateSignupFields, ValidateSigninFields, ValidateUpdateFields, validateIdParam, validateActivationStatus, ValidatePasswordFields, ErrorHandling }

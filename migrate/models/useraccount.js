@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     LastLoginIn: DataTypes.DATE,
     IsDeleted: DataTypes.BOOLEAN,
     IsDisabled: DataTypes.BOOLEAN,
+    IsAdmin: DataTypes.BOOLEAN,
     RoleId: DataTypes.INTEGER
   }, {
     sequelize,

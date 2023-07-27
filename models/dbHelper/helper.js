@@ -1,5 +1,7 @@
 const bcrypt = require("bcryptjs");
 const { UserDetails, UserRole, UserAccount } = require("../index");
+const { Op } = require("sequelize");
+const { SendResponse } = require("../../utils/utils");
 
 const FindRoleByName = async (roleName) => {
   return UserRole.findOne({ where: { Role: roleName }, });
@@ -96,7 +98,59 @@ const DeleteUserDetails = async (UserId) => {
   return;
 };
 
+const FetchAdminDetails = async () => {
+  const adminDetails = await UserDetails.findOne({
+    attributes: ['Email', 'FirstName', 'LastName'],
+    include: [{
+      model: UserAccount,
+      where: { IsAdmin: true },
+      attributes: ["IsAdmin", "RoleId"],
+      required: true
+    }],
+  });
+
+  if (!adminDetails) {
+    return SendResponse(res, 400, "Admin User Not Found", null, false);
+  }
+
+  return {
+    Email: adminDetails.Email,
+    FirstName: adminDetails.FirstName,
+    LastName: adminDetails.LastName,
+    IsAdmin: adminDetails.UserAccount.IsAdmin,
+    RoleId: adminDetails.UserAccount.RoleId
+  };
+}
+
+const FetchNormalUsersDetails = async () => {
+  const normalUsers = await UserDetails.findAll({
+    attributes: ['Email', 'FirstName', 'LastName'],
+    include: [{
+      model: UserAccount,
+      where: {
+        IsAdmin: {
+          [Op.not]: true
+        },
+      },
+      attributes: ["IsAdmin", "RoleId"],
+      required: true
+
+    }],
+  });
+
+  const users = normalUsers.map((user) => ({
+    Email: user.Email,
+    FirstName: user.FirstName,
+    LastName: user.LastName,
+    IsAdmin: user?.UserAccount?.IsAdmin,
+    RoleId: user?.UserAccount?.RoleId
+  }))
+
+  return users;
+};
+
+
 module.exports = {
   GenerateHashPassword, SignUpUserAccount, SignUpUserDetails, FindRoleByName, FindUserById, FindUserByEmail,
-  FetchUserDetails, FindUserByParam, DeleteUserDetails, FindUser
+  FetchUserDetails, FindUserByParam, DeleteUserDetails, FindUser, FetchAdminDetails, FetchNormalUsersDetails
 };

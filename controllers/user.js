@@ -1,5 +1,6 @@
 const { SendResponse } = require("../utils/utils");
-const { SignUpUserDetails, SignUpUserAccount, FetchUserDetails, DeleteUserDetails } = require("../models/dbHelper/helper");
+const { SignUpUserDetails, SignUpUserAccount, FetchUserDetails, DeleteUserDetails, GenerateHashPassword } = require("../models/dbHelper/helper");
+const { UserDetails } = require("../models/index")
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -8,7 +9,8 @@ const SignUp = async (req, res, next) => {
 
   try {
 
-    const newUserAccount = await SignUpUserAccount(req.RoleId);
+    const UserId = req.RoleId;
+    const newUserAccount = await SignUpUserAccount(UserId);
 
     const newUserDetails = await SignUpUserDetails(newUserAccount.UserId, Email, Password, FirstName, LastName);
 
@@ -25,6 +27,8 @@ const SignIn = async (req, res, next) => {
 
     const existingUser = req.existingUser;
 
+    const userDetails = req.admin;
+
     // comparing the password..
     const isValidPassword = await bcrypt.compare(Password, existingUser.Password);
 
@@ -36,17 +40,18 @@ const SignIn = async (req, res, next) => {
     const payload = {
       FirstName: existingUser.FirstName,
       LastName: existingUser.LastName,
-      Email: existingUser.Email
+      Email: existingUser.Email,
+      IsAdmin: userDetails.IsAdmin
     };
 
     // setting token expiration for only 2 minutes...
     // const expireTime = 120;
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: "24h" });
+    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: "240s" });
 
+    const user = { token, IsAdmin: userDetails.IsAdmin };
 
-
-    return SendResponse(res, 200, "Signin Successful", token, true);
+    return SendResponse(res, 200, "Signin Successful", user, true);
 
   } catch (error) {
     next(error);
@@ -125,4 +130,32 @@ const PermanentDeleteUser = async (req, res, next) => {
   }
 };
 
-module.exports = { SignUp, SignIn, DeleteUser, UserActivation, GetUserDetails, PermanentDeleteUser, UpdateUser };
+const ChangeUserPassword = async (req, res, next) => {
+  const { Password, NewPassword } = req.body;
+
+  try {
+    const user = req.validUser;
+
+    const isValidPassword = await bcrypt.compare(Password, user.Password)
+    // console.log("user hai", user);
+    // console.log("valid hai kya", isValidPassword)
+
+    if (!isValidPassword) {
+      return SendResponse(res, 401, "User Not Found", null, false)
+    }
+
+    // if valid then do the encyryption.....
+    const hashedPassword = await GenerateHashPassword(NewPassword);
+
+    await UserDetails.update(
+      { Password: hashedPassword },
+      { where: { Email: user.Email } }
+    );
+
+    return SendResponse(res, 200, "Password Changed Successfully", null, true);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { SignUp, SignIn, DeleteUser, UserActivation, GetUserDetails, PermanentDeleteUser, UpdateUser, ChangeUserPassword };
