@@ -1,6 +1,5 @@
 require("dotenv").config();
 const express = require("express");
-const cors = require("cors");
 const path = require('path');
 const { PageNotFound, SendError } = require("./utils/utils");
 
@@ -16,7 +15,6 @@ app.listen(PORT, async () => {
 
 // parsing the data
 app.use(express.json());
-app.use(cors());
 
 app.use("/api/route", RouteHandler);
 

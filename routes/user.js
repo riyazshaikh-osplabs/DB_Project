@@ -16,7 +16,8 @@ router.get("/userDetails/:id", validateIdParam, ErrorHandling, IsLoggedIn, Valid
 
 // post rotues...
 router.post("/signup", ValidateSignupFields, UserExistsByEmailSignup, RoleExistsMiddleware, ErrorHandling, SignUp);
-router.post("/signin", ValidateSigninFields, UserExistsByEmailSignin, CheckUserActivation, CheckUserAccountSanitizer, ErrorHandling, SignIn);
+router.post("/signin", ValidateSigninFields, UserExistsByEmailSignin, CheckUserActivation,
+    CheckUserAccountSanitizer, ErrorHandling, SignIn);
 router.post("/activation/:id", validateIdParam, validateActivationStatus, CheckUserForUserAccount, IsLoggedIn, ErrorHandling, UserActivation);
 
 

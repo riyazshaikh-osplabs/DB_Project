@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const { UserDetails, UserAccount } = require("../models");
 const { FindRoleByName, FindUserByEmail, FindUser, GenerateHashPassword } = require("../models/dbHelper/helper");
 const { SendResponse } = require("../utils/utils");
-const bcrypt = require("bcryptjs");
 
 const RoleExistsMiddleware = async (req, res, next) => {
 

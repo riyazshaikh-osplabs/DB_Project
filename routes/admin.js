@@ -14,8 +14,8 @@ const { ValidateSigninFields, validateIdParam, ValidateUpdateFields, validateAct
 
 // get routes...
 router.get('/details', IsLoggedIn, ValidateIsAdmin, ErrorHandling, GetAdminDetails);
-router.get('/list', GetAdminDetails1);
-// router.get('/list', IsLoggedIn, ValidateIsAdmin, ErrorHandling, GetUsersList);
+// router.get('/list', GetAdminDetails1);
+router.get('/list', IsLoggedIn, ValidateIsAdmin, ErrorHandling, GetUsersList);
 router.get("/viewEngine", ViewEngine);
 
 // post routes....

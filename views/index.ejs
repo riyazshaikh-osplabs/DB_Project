@@ -1,80 +1,29 @@
-<!-- index.ejs (your view file)
+<!-- views/index.ejs -->
 <!DOCTYPE html>
 <html>
 <head>
-  <title>User Details</title>
+    <title>Admin User Details</title>
 </head>
 <body>
-  <div id="userList"></div>
-  <h1>
-    <h3>FirstName: <%= FirstName %></h3>
-    <h3>LastName : <%= LastName %></h3>
-  </h1>
+  <h2>Admin User Details</h2>
+  <ul>
+    <li> FirstName : <%= user.FirstName %>   </li>
+    <li> LastName : <%= user.LastName %>   </li>
+    <li> Email :  <%= user.Email %>   </li>
+    <li> IsAdmin : <%= user.IsAdmin %>   </li>
+    <li> RoleId : <%= user.RoleId %>   </li>
+  </ul>
 
-  <script>
-
-const fetchUsers = async () => {
-      try {
-        const userList = document.querySelector("#userList");
-        const response = await fetch('http://localhost:5000/api/route/admin/list');
-        const data = await response.json();
-        console.log(data);
-
-        data.forEach((user) => {
-          const userElement = document.createElement('h2');
-          userElement.textContent = `${user.Email} ${user.FirstName} ${user.LastName} ${user.IsAdmin} ${user.RoleId} `;
-          userList.appendChild(userElement);
-        });
-      } catch (error) {
-        console.error('Error fetching user details:', error);
-      }
-    }
-
-    fetchUsers();
-
-  </script>
-</body>
-</html> -->
-
-<!-- index.ejs (your updated view file) -->
-<!DOCTYPE html>
-<html>
-<head>
-  <title>User Details</title>
-</head>
-<body>
-  <div id="userList"></div>
-  <h1>
-    <h3>FirstName: <%= FirstName %></h3>
-    <h3>LastName: <%= LastName %></h3>
-  </h1>
-
-  <script>
-    const fetchUsers = async () => {
-      try {
-        const userList = document.querySelector("#userList");
-        const response = await fetch('http://localhost:5000/api/route/admin/list');
-        const data = await response.json();
-        console.log(data);
-
-        if (Array.isArray(data)) {
-          data.forEach((user) => {
-            const userElement = document.createElement('h2');
-            userElement.textContent = `${user.FirstName} ${user.LastName} - Email: ${user.Email}`;
-            userList.appendChild(userElement);
-          });
-        } else {
-          const userElement = document.createElement('h2');
-          userElement.textContent = `${data.FirstName} ${data.LastName} - Email: ${data.Email}`;
-          userList.appendChild(userElement);
-        }
-      }
-       catch (error) {
-        console.error('Error fetching user details:', error);
-      }
-    }
-
-    fetchUsers();
-  </script>
+   <h2>User Details</h2>
+  <ul>
+    <% users.forEach(user => { %>
+    <li> FirstName : <%= user.FirstName %>   </li>
+    <li> LastName : <%= user.LastName %>   </li>
+    <li> Email :  <%= user.Email %>   </li>
+    <li> IsAdmin : <%= user.IsAdmin %>   </li>
+    <li> RoleId : <%= user.RoleId %>   </li>
+    <% }) %>
+    <br>
+  </ul>
 </body>
 </html>

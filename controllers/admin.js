@@ -3,6 +3,7 @@ const { FetchAdminDetails, FetchNormalUsersDetails, GenerateHashPassword, Update
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { UserDetails, UserAccount } = require("../models");
+const { Op } = require("sequelize");
 
 const AdminSignIn = async (req, res, next) => {
 
@@ -110,11 +111,57 @@ const UpdateNormalUser = async (req, res, next) => {
 
 const ViewEngine = async (req, res, next) => {
     try {
-        res.render('index', { FirstName: "Riyaz", LastName: "Shaikh" });
+        const adminDetails = await UserDetails.findOne({
+            attributes: ['Email', 'FirstName', 'LastName'],
+            include: [{
+                model: UserAccount,
+                where: { IsAdmin: true },
+                attributes: ["IsAdmin", "RoleId"],
+                required: true
+            }],
+        });
+
+        const normalUsers = await UserDetails.findAll({
+            attributes: ['Email', 'FirstName', 'LastName'],
+            include: [{
+                model: UserAccount,
+                where: {
+                    IsAdmin: {
+                        [Op.not]: true
+                    },
+                },
+                attributes: ["IsAdmin", "RoleId"],
+                required: true
+
+            }],
+        });
+
+        const users = normalUsers.map((user) => ({
+            Email: user.Email,
+            FirstName: user.FirstName,
+            LastName: user.LastName,
+            IsAdmin: user?.UserAccount?.IsAdmin,
+            RoleId: user?.UserAccount?.RoleId
+        }))
+
+        if (!adminDetails) {
+            return SendResponse(res, 400, "Admin User Not Found", null, false);
+        }
+
+        const user = {
+            Email: adminDetails.Email,
+            FirstName: adminDetails.FirstName,
+            LastName: adminDetails.LastName,
+            IsAdmin: adminDetails.UserAccount.IsAdmin,
+            RoleId: adminDetails.UserAccount.RoleId
+        };
+
+        console.log(users);
+        res.render('index', { user, users });
     } catch (error) {
         next(error);
     }
-}
+};
 
 const GetAdminDetails1 = async (req, res, next) => {
     try {
@@ -139,7 +186,8 @@ const GetAdminDetails1 = async (req, res, next) => {
             IsAdmin: adminDetails.UserAccount.IsAdmin,
             RoleId: adminDetails.UserAccount.RoleId
         };
-        SendResponse(res, 200, "User List", [user], true);
+
+        res.render('index', { user });
     } catch (error) {
         next(error);
     }
