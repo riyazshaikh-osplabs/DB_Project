@@ -139,7 +139,7 @@ const GetAdminDetails1 = async (req, res, next) => {
             IsAdmin: adminDetails.UserAccount.IsAdmin,
             RoleId: adminDetails.UserAccount.RoleId
         };
-        SendResponse(res, 200, "User List", user, true);
+        SendResponse(res, 200, "User List", [user], true);
     } catch (error) {
         next(error);
     }
