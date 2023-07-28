@@ -49,20 +49,26 @@ const ValidateSigninFields = [
 
 const validateIdParam = [
     param('id')
-        .notEmpty().withMessage('ID is required')
+        .notEmpty().withMessage('ID is required').bail()
         .isInt({ min: 1 }).withMessage('ID must be a positive integer').bail()
+        .custom((value) => {
+            if (isNaN(value)) {
+                throw new Error("ID must be a positive integer")
+            }
+            return value;
+        })
 ];
 
 const ValidateUpdateFields = [
     body('FirstName')
         .optional()
-        .isLength({ min: 3, max: 20 }).withMessage("firstname length should be more than 8 and less than 21 characters!").bail()
+        .isLength({ min: 3, max: 20 }).withMessage("firstname length should be more than 3 and less than 21 characters!").bail()
         .isAlpha().withMessage('First name must contain only alphabetic characters'),
 
     body('LastName')
         .optional()
-        .isAlpha().withMessage('Last name must contain only alphabetic characters')
         .isLength({ min: 3, max: 20 }).withMessage("lastname length should be more than 8 and less than 21 characters!").bail()
+        .isAlpha().withMessage('Last name must contain only alphabetic characters').bail()
         .custom((value, { req }) => {
             if (value == req.body.FirstName) {
                 throw new Error("FirstName should not be equals to LastName!");
@@ -88,8 +94,15 @@ const ValidatePasswordFields = [
         .isStrongPassword().withMessage('the password must contain 6 characters, 1 lower case letter, 1 upper case letter, 1 number and 1 symbol'),
 
     body("NewPassword")
-        .notEmpty().withMessage("Password field is required").bail()
-        .isStrongPassword().withMessage('the password must contain 6 characters, 1 lower case letter, 1 upper case letter, 1 number and 1 symbol'),
+        .notEmpty().withMessage("New Password field is required").bail()
+        .isStrongPassword().withMessage('the password must contain 6 characters, 1 lower case letter, 1 upper case letter, 1 number and 1 symbol').bail()
+    // .custom((value, { req }) => {
+    //     if (value == req.body.NewPassword) {
+    //         throw new Error("New Password should not be equals to Current Password!");
+    //     } else {
+    //         return value;
+    //     }
+    // }),
 ];
 
 const ErrorHandling = (req, res, next) => {

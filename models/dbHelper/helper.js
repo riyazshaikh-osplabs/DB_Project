@@ -123,6 +123,7 @@ const FetchAdminDetails = async () => {
 }
 
 const FetchNormalUsersDetails = async () => {
+
   const normalUsers = await UserDetails.findAll({
     attributes: ['Email', 'FirstName', 'LastName'],
     include: [{
@@ -134,7 +135,6 @@ const FetchNormalUsersDetails = async () => {
       },
       attributes: ["IsAdmin", "RoleId"],
       required: true
-
     }],
   });
 

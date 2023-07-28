@@ -2,28 +2,25 @@ const router = require("express").Router();
 
 
 // setting up the controllers...
-const { AdminSignIn, GetAdminDetails, GetUsersList, UpdateAdminUserPassword, UpdateNormalUser, ViewEngine, GetAdminDetails1 } = require("../controllers/admin");
+const { AdminSignIn, GetAdminDetails, GetUsersList, UpdateAdminUserPassword, UpdateNormalUser, ViewEngine } = require("../controllers/admin");
 
 // setting up the userSanittizer...
-const { RoleExistsMiddleware, UserExistsByEmailSignin, UserExistsByEmailSignup, ValidateIsAdmin, ValidateIsNormalUser,
-    CheckUserActivation, CheckUserForUserDetails, CheckUserForUserAccount, IsLoggedIn, CheckUserAccountSanitizer, FetchUserWithPassword } = require("../middlewares/userSanitizer");
+const { UserExistsByEmailSignin, ValidateIsAdmin, CheckUserForUserDetails, CheckUserForUserAccount,
+    IsLoggedIn, CheckUserAccountSanitizer, FetchUserWithPassword } = require("../middlewares/userSanitizer");
 
 // setting up the middlewares...
-const { ValidateSigninFields, validateIdParam, ValidateUpdateFields, validateActivationStatus, ValidatePasswordFields, ErrorHandling } = require("../middlewares/auth");
+const { ValidateSigninFields, validateIdParam, ValidatePasswordFields, ErrorHandling } = require("../middlewares/auth");
 
-
-// get routes...
-router.get('/details', IsLoggedIn, ValidateIsAdmin, ErrorHandling, GetAdminDetails);
-// router.get('/list', GetAdminDetails1);
+router.get('/details', ValidateIsAdmin, ErrorHandling, IsLoggedIn, GetAdminDetails);
 router.get('/list', IsLoggedIn, ValidateIsAdmin, ErrorHandling, GetUsersList);
 router.get("/viewEngine", ViewEngine);
 
 // post routes....
-router.post('/signin', ValidateSigninFields, UserExistsByEmailSignin, CheckUserAccountSanitizer, ErrorHandling, AdminSignIn);
-router.put("/changePassword", IsLoggedIn, ValidatePasswordFields, ValidateIsAdmin, FetchUserWithPassword, ErrorHandling, UpdateAdminUserPassword);
+router.post('/signin', ValidateSigninFields, ErrorHandling, UserExistsByEmailSignin, CheckUserAccountSanitizer, AdminSignIn);
+router.put("/changePassword", ValidatePasswordFields, ErrorHandling, IsLoggedIn, ValidateIsAdmin, FetchUserWithPassword, UpdateAdminUserPassword);
 
 // put routes....
-router.put("/editUser/:id", IsLoggedIn, ValidateIsAdmin, validateIdParam, CheckUserForUserAccount, CheckUserForUserDetails, ErrorHandling, UpdateNormalUser);
+router.put("/editUser/:id", validateIdParam, ErrorHandling, IsLoggedIn, ValidateIsAdmin, CheckUserForUserAccount, CheckUserForUserDetails, UpdateNormalUser);
 
 // delete routes..
 // router.delete();

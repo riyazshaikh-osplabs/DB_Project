@@ -63,35 +63,34 @@ const UserExistsByEmailSignin = async (req, res, next) => {
     }
 };
 
-const
-    CheckUserActivation = async (req, res, next) => {
+const CheckUserActivation = async (req, res, next) => {
 
-        const { Email } = req.body;
+    const { Email } = req.body;
 
-        try {
+    try {
 
-            const existingUser = await FindUserByEmail(Email);
+        const existingUser = await FindUserByEmail(Email);
 
-            if (!existingUser) {
-                return SendResponse(res, 404, "User Not Found!", null, false);
-            }
-
-            const user = await FindUser(existingUser);
-
-            if (!user) {
-                return SendResponse(res, 404, "User Not Found!", null, false);
-            }
-
-            if (user.IsDeleted || user.IsDisabled) {
-                const message = user.IsDeleted ? "User Account is Deleted!" : "User Account is Disabled";
-                return SendResponse(res, 403, message, null, false);
-            }
-
-            next();
-        } catch (error) {
-            next(error);
+        if (!existingUser) {
+            return SendResponse(res, 404, "User Not Found!", null, false);
         }
-    };
+
+        const user = await FindUser(existingUser);
+
+        if (!user) {
+            return SendResponse(res, 404, "User Not Found!", null, false);
+        }
+
+        if (user.IsDeleted || user.IsDisabled) {
+            const message = user.IsDeleted ? "User Account is Deleted!" : "User Account is Disabled";
+            return SendResponse(res, 403, message, null, false);
+        }
+
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 // module.exports = { RoleExistsMiddleware, UserExistsByEmailSignin, UserExistsByEmailSignup, CheckUserActivation };
@@ -132,6 +131,9 @@ const CheckUserForUserAccount = async (req, res, next) => {
     }
 };
 
+/**
+ * Validates tokrn
+ */
 const IsLoggedIn = (req, res, next) => {
 
     try {
@@ -202,7 +204,7 @@ const ValidateIsNormalUser = (req, res, next) => {
     try {
         const user = req.User;
 
-        if (user.IsAdmin === true) {
+        if (user.IsAdmin) {
             return SendResponse(res, 401, "Unauthorized User!", null, false);
         } else {
             next();
@@ -226,34 +228,6 @@ const FetchUserWithPassword = async (req, res, next) => {
     req.validUser = validUser;
     next();
 }
-
-// const ValidatingAndUpdatePassword = async (req, res, next) => {
-//     const { Password, NewPassword } = req.body;
-
-//     try {
-//         const user = req.validUser;
-
-//         const isValidPassword = await bcrypt.compare(Password, user.Password)
-//         // console.log("user hai", user);
-//         // console.log("valid hai kya", isValidPassword)
-
-//         if (!isValidPassword) {
-//             return SendResponse(res, 401, "User Not Found", null, false)
-//         }
-
-//         // if valid then do the encyryption.....
-//         const hashedPassword = await GenerateHashPassword(NewPassword);
-
-//         await UserDetails.update({
-//             Password: hashedPassword,
-//             where: { Email: user.Email }
-//         });
-
-//         next();
-//     } catch (error) {
-//         next(error);
-//     }
-// };
 
 module.exports = {
     RoleExistsMiddleware, UserExistsByEmailSignin, CheckUserAccountSanitizer, FetchUserWithPassword,

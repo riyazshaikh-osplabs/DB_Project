@@ -137,8 +137,6 @@ const ChangeUserPassword = async (req, res, next) => {
     const user = req.validUser;
 
     const isValidPassword = await bcrypt.compare(Password, user.Password)
-    // console.log("user hai", user);
-    // console.log("valid hai kya", isValidPassword)
 
     if (!isValidPassword) {
       return SendResponse(res, 401, "User Not Found", null, false)
