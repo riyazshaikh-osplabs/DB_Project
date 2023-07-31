@@ -73,7 +73,8 @@ const FetchUserDetails = async (UserId) => {
     Email: user.Email,
     FirstName: user.FirstName,
     LastName: user.LastName,
-    RoleName: user.UserAccount?.UserRole.Role ?? "null"
+    RoleName: user.UserAccount?.UserRole.Role ?? "null",
+    ProfilePicUrl: user.profilePicUrl
   };
 };
 
@@ -163,7 +164,35 @@ const UpdateUser = async (user, foundUser) => {
   return modifiedUser;
 }
 
+const updateUserDetailsProfilePicUrl = async (userId, imageUrl) => {
+
+  let userDetails = await UserDetails.findOne({ where: { UserId: userId } });
+  if (!userDetails) {
+    throw new Error('User Details Not Found!');
+  }
+  userDetails.profilePicUrl = `${process.env.BASE_URL}/${imageUrl}`;
+
+  await userDetails.save();
+
+  return userDetails;
+};
+
+
+const getProfilePicUrl = async (userId) => {
+  try {
+    const user = await UserDetails.findByPk(userId);
+    if (!user) {
+      return null;
+    }
+    return user.profilePicUrl;
+  } catch (error) {
+    next(error);
+  }
+
+
+}
+
 module.exports = {
-  GenerateHashPassword, SignUpUserAccount, SignUpUserDetails, FindRoleByName, FindUserById, FindUserByEmail,
-  FetchUserDetails, FindUserByParam, DeleteUserDetails, FindUser, FetchAdminDetails, FetchNormalUsersDetails, UpdateUser
+  GenerateHashPassword, SignUpUserAccount, SignUpUserDetails, FindRoleByName, FindUserById, FindUserByEmail, updateUserDetailsProfilePicUrl,
+  FetchUserDetails, FindUserByParam, DeleteUserDetails, FindUser, FetchAdminDetails, FetchNormalUsersDetails, UpdateUser, getProfilePicUrl
 };

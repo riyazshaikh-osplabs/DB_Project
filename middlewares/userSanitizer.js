@@ -1,7 +1,35 @@
 const jwt = require("jsonwebtoken");
 const { UserDetails, UserAccount } = require("../models");
-const { FindRoleByName, FindUserByEmail, FindUser, GenerateHashPassword } = require("../models/dbHelper/helper");
+const { FindRoleByName, FindUserByEmail, FindUser, GenerateHashPassword, updateUserDetailsProfilePicUrl, getProfilePicUrl } = require("../models/dbHelper/helper");
 const { SendResponse } = require("../utils/utils");
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        return cb(null, 'uploads')
+    },
+    filename: function (req, file, cb) {
+        const UserId = req.User.UserId;
+        const extension = path.extname(file.originalname);
+        cb(null, `${UserId}${extension}`);
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024,
+    },
+    fileFilter: (req, file, cb) => {
+
+        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+            cb(null, true);
+        } else {
+            return cb(new Error('Invalid mime type only jpg,png,jpeg formats are allowed'));
+        }
+    }
+});
 
 const RoleExistsMiddleware = async (req, res, next) => {
 
@@ -156,6 +184,7 @@ const IsLoggedIn = (req, res, next) => {
         }
 
         const user = {
+            UserId: verifiedUser.UserId,
             FirstName: verifiedUser.FirstName,
             LastName: verifiedUser.LastName,
             Email: verifiedUser.Email,
@@ -227,11 +256,50 @@ const FetchUserWithPassword = async (req, res, next) => {
 
     req.validUser = validUser;
     next();
-}
+};
+
+const uploadSingleImage = upload.single("profilePic");
+
+const UploadProfilePicMiddleware = async (req, res, next) => {
+
+    const contentTypeHeader = req.headers['content-type'];
+
+    try {
+        if (!contentTypeHeader || !contentTypeHeader.includes('multipart/form-data')) {
+            return res.status(400).send({ message: 'Invalid Content-Type header. Use "multipart/form-data"' });
+        }
+
+        const userId = req.User.UserId;
+        const existingProfilePic = await getProfilePicUrl(userId);
+
+        if (existingProfilePic) {
+            return SendResponse(res, 400, "User had already uploaded picture", null, false);
+        }
+
+        uploadSingleImage(req, res, async (err) => {
+            if (err) {
+                return res.status(400).send({ message: err.message + " give proper profilePic" });
+            }
+
+            if (!req.file) {
+                return res.status(400).send({ message: 'No image uploaded' });
+            }
+
+            const userId = req.User.UserId;
+            const imageUrl = path.join('uploads', `${userId}${path.extname(req.file.originalname)}`);
+
+            await updateUserDetailsProfilePicUrl(userId, imageUrl);
+
+            next();
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
 module.exports = {
     RoleExistsMiddleware, UserExistsByEmailSignin, CheckUserAccountSanitizer, FetchUserWithPassword,
-    UserExistsByEmailSignup, CheckUserForUserDetails, ValidateIsNormalUser,
+    UserExistsByEmailSignup, CheckUserForUserDetails, ValidateIsNormalUser, UploadProfilePicMiddleware,
     CheckUserForUserAccount, CheckUserActivation, IsLoggedIn, ValidateIsAdmin
 };
 

@@ -15,6 +15,8 @@ app.listen(PORT, async () => {
 
 // parsing the data
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 app.use("/api/route", RouteHandler);
 

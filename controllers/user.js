@@ -38,6 +38,7 @@ const SignIn = async (req, res, next) => {
 
     // if password is valid. creating a token with payload..
     const payload = {
+      UserId: existingUser.UserId,
       FirstName: existingUser.FirstName,
       LastName: existingUser.LastName,
       Email: existingUser.Email,
@@ -164,4 +165,27 @@ const User = async (req, res, next) => {
   }
 }
 
-module.exports = { SignUp, User, SignIn, DeleteUser, UserActivation, GetUserDetails, PermanentDeleteUser, UpdateUser, ChangeUserPassword };
+const UploadProfilePic = (req, res, next) => {
+
+  try {
+
+    if (!req.file) {
+      return res.status(400).send({ message: 'File upload failed.' });
+    }
+
+    const file = req.file;
+
+    res.status(200).send({
+      filename: file.filename,
+      mimetype: file.mimetype,
+      originalname: file.originalname,
+      size: file.size,
+      fieldname: file.fieldname,
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { SignUp, User, SignIn, DeleteUser, UserActivation, GetUserDetails, PermanentDeleteUser, UpdateUser, ChangeUserPassword, UploadProfilePic };

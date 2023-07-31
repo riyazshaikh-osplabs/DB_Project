@@ -40,6 +40,12 @@ const UserDetails = sequelize.define(
       allowNull: false,
     },
 
+    profilePicUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null
+    }
+
   },
   { freezeTableName: true, timestamps: false }
 );
